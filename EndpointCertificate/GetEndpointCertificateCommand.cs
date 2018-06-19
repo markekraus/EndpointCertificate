@@ -27,7 +27,7 @@ namespace markekraus.EndpointCertificate
 
                 return true;
             };
-        
+
         private static EndpointCertificate lastEndpointCertificate;
 
         [Parameter(
@@ -41,14 +41,17 @@ namespace markekraus.EndpointCertificate
         // This method will be called for each input received from the pipeline to this cmdlet; if no input is received, this method is not called
         protected override void ProcessRecord()
         {
-            try 
+            WriteVerbose($"Processing {Uri}");
+            try
             {
                 using(var client = new TcpClient())
                 {
+                    WriteVerbose($"Connecting to {Uri.Host}:{Uri.Port}");
                     client.Connect(Uri.Host, Uri.Port);
 
                     using(var sslStream = new SslStream(client.GetStream(), false, trustAllCertificates, null))
                     {
+                        WriteVerbose($"Authenticate to {Uri.Host}");
                         sslStream.AuthenticateAsClient(Uri.Host);
                         
                         // lastEndpointCertificate  is set in the SslStream Validation Callback.
@@ -56,7 +59,7 @@ namespace markekraus.EndpointCertificate
                         if(lastEndpointCertificate == null)
                         {
                             WriteError(
-                                new ErrorRecord(new NullReferenceException("Endpoint certificate was not set in SslStream validation callback."), 
+                                new ErrorRecord(new NullReferenceException("Endpoint certificate was not set in SslStream validation callback."),
                                 "ValidationCallbackFailure",
                                 ErrorCategory.InvalidResult,
                                 Uri));
