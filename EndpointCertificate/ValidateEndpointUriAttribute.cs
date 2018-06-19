@@ -8,7 +8,7 @@ namespace markekraus.EndpointCertificate
             Uri uri = (Uri)arguments;
             if(uri.Scheme != "https")
             {
-                throw new Exception();
+                throw new ParameterBindingException("URI must begin with https.");
             }
         }
     }
